@@ -2,7 +2,7 @@
   "name": "claude-code-context-add",
   "displayName": "Claude Code Context Add",
   "description": "Add files and selections to Claude Code terminal/panel context via right-click menus and keyboard shortcuts. Forked from claude-code-context-plus.",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "publisher": "YangYangLeeLee",
   "repository": {
     "type": "git",

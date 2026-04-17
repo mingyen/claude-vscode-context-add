@@ -10,7 +10,7 @@ export class StatusBar implements vscode.Disposable {
       vscode.StatusBarAlignment.Right,
       50,
     );
-    this.item.command = 'claudeContextPlus.sendSelectionToContext';
+    this.item.command = 'claudeContextAdd.sendSelectionToContext';
 
     this.disposables.push(
       this.item,

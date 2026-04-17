@@ -2,18 +2,39 @@ import * as vscode from 'vscode';
 import { TerminalDetector } from './terminalDetector';
 import { ContextSender } from './contextSender';
 import { StatusBar } from './statusBar';
+import { PanelSender } from './panelSender';
+
+type Target = 'auto' | 'terminal' | 'panel';
+
+function getTarget(): Target {
+  const cfg = vscode.workspace.getConfiguration('claudeContextAdd');
+  return cfg.get<Target>('target', 'auto');
+}
+
+function resolveTarget(
+  detector: TerminalDetector,
+): 'terminal' | 'panel' | 'none' {
+  const t = getTarget();
+  if (t === 'terminal') return detector.hasTarget ? 'terminal' : 'none';
+  if (t === 'panel') return PanelSender.isAvailable() ? 'panel' : 'none';
+  // auto: terminal first, panel as fallback
+  if (detector.hasTarget) return 'terminal';
+  if (PanelSender.isAvailable()) return 'panel';
+  return 'none';
+}
 
 export function activate(context: vscode.ExtensionContext) {
   const detector = new TerminalDetector();
   const sender = new ContextSender(detector);
   const statusBar = new StatusBar(detector);
+  const panelSender = new PanelSender();
 
   context.subscriptions.push(detector, statusBar);
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'claudeContextPlus.addFileToContext',
-      (uri?: vscode.Uri, uris?: vscode.Uri[]) => {
+      'claudeContextAdd.addFileToContext',
+      async (uri?: vscode.Uri, uris?: vscode.Uri[]) => {
         // When invoked from explorer context menu, `uri` is the right-clicked
         // item and `uris` is all selected items (if multi-select).
         // When invoked from editor title context or keybinding, fall back to active editor.
@@ -30,23 +51,36 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showWarningMessage('No file to add.');
           return;
         }
-        sender.addFiles(targets);
+
+        switch (resolveTarget(detector)) {
+          case 'terminal': sender.addFiles(targets); break;
+          case 'panel': await panelSender.addFiles(targets); break;
+          default: vscode.window.showWarningMessage(
+            'No Claude Code target found. Open a terminal or install the Claude Code extension.',
+          );
+        }
       },
     ),
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'claudeContextPlus.sendSelectionToContext',
-      () => {
-        sender.sendSelection();
+      'claudeContextAdd.sendSelectionToContext',
+      async () => {
+        switch (resolveTarget(detector)) {
+          case 'terminal': sender.sendSelection(); break;
+          case 'panel': await panelSender.sendSelection(); break;
+          default: vscode.window.showWarningMessage(
+            'No Claude Code target found. Open a terminal or install the Claude Code extension.',
+          );
+        }
       },
     ),
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'claudeContextPlus.setAsClaudeTerminal',
+      'claudeContextAdd.setAsClaudeTerminal',
       async () => {
         const active = vscode.window.activeTerminal;
         const terminals = vscode.window.terminals;
@@ -87,7 +121,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
-      'claudeContextPlus.selectTerminal',
+      'claudeContextAdd.selectTerminal',
       async () => {
         const claudeTerminals = detector.getClaudeTerminals();
 
@@ -117,6 +151,48 @@ export function activate(context: vscode.ExtensionContext) {
 
         if (picked) {
           detector.designate(picked.terminal);
+        }
+      },
+    ),
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      'claudeContextAdd.selectTarget',
+      async () => {
+        const current = vscode.workspace
+          .getConfiguration('claudeContextAdd')
+          .get<string>('target', 'auto');
+
+        const items: vscode.QuickPickItem[] = [
+          {
+            label: 'auto',
+            description: 'Terminal first, fall back to Claude Code extension panel',
+            detail: current === 'auto' ? '$(check) current' : undefined,
+          },
+          {
+            label: 'terminal',
+            description: 'Always send to the Claude Code terminal',
+            detail: current === 'terminal' ? '$(check) current' : undefined,
+          },
+          {
+            label: 'panel',
+            description: 'Always send to the Claude Code VS Code extension panel',
+            detail: current === 'panel' ? '$(check) current' : undefined,
+          },
+        ];
+
+        const picked = await vscode.window.showQuickPick(items, {
+          placeHolder: `Current: ${current} — select new target mode`,
+        });
+
+        if (picked) {
+          await vscode.workspace
+            .getConfiguration('claudeContextAdd')
+            .update('target', picked.label, vscode.ConfigurationTarget.Global);
+          vscode.window.showInformationMessage(
+            `Claude Code Context Add: target set to "${picked.label}"`,
+          );
         }
       },
     ),

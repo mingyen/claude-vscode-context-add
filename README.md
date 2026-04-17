@@ -1,8 +1,9 @@
-# Claude Code Context Plus
+# Claude Code Context Add
 
-A VS Code extension that bridges your editor and [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI. Right-click files or selections to send them as `@`-references directly into your Claude Code terminal.
+A VS Code extension that bridges your editor and [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI. Right-click files or selections to send them as `@`-references directly into your Claude Code terminal or the Claude Code VS Code extension panel.
 
-Born out of switching from Cursor to Claude Code — this extension brings back some most-missed editor integrations: right-click to send files and selections as prompt context.
+> **Forked from [claude-code-context-plus](https://github.com/jeffycyang/claude-vscode-context-plus) by [@jeffycyang](https://github.com/jeffycyang)**, licensed under MIT.
+> Added support for the Claude Code VS Code extension panel (sidebar / editor tab), target configuration, and bug fixes.
 
 ## Features
 
@@ -18,14 +19,16 @@ Select code in the editor, right-click, and choose **"Send Selection to Claude C
 
 ![Send selection to Claude Code context menu](resources/send-selection-context-menu.png)
 
-### Result in terminal
+### Result in terminal or panel
 
-References are typed into the Claude Code terminal input without pressing Enter, so you stay in control.
+References are typed into the Claude Code input without pressing Enter, so you stay in control — works with both the terminal and the Claude Code VS Code extension panel (sidebar or editor tab).
 
 ![Terminal showing @ reference](resources/terminal-reference.png)
 
 ### More features
 
+- **Claude Code VS Code extension panel support** — In addition to the terminal, supports sending references directly to the Claude Code VS Code extension (sidebar or editor tab). Auto-detects which is available.
+- **Target configuration** — Choose between `auto` (terminal first, panel as fallback), `terminal`, or `panel` via the `claudeContextAdd.target` setting.
 - **Multi-root workspace support** — Correctly resolves paths in multi-root workspaces. Files in the terminal's folder use relative paths; files in other folders use absolute paths.
 - **Auto-detect Claude Code terminals** — Automatically finds terminals named "Claude Code" or matching version patterns (e.g. `1.0.32`). Configurable with custom regex patterns.
 - **Manual terminal designation** — Use the command palette to manually designate any terminal as your Claude Code target.
@@ -51,13 +54,16 @@ All commands are available via the command palette (`Cmd+Shift+P`):
 
 | Setting | Type | Default | Description |
 |---|---|---|---|
-| `claudeContextPlus.terminalNamePatterns` | `string[]` | `[]` | Additional regex patterns to match terminal names as Claude Code terminals |
+| `claudeContextAdd.target` | `"auto"\|"terminal"\|"panel"` | `"auto"` | Where to send references: terminal, Claude Code VS Code extension panel, or auto-detect |
+| `claudeContextAdd.terminalNamePatterns` | `string[]` | `[]` | Additional regex patterns to match terminal names as Claude Code terminals |
 
 ## How It Works
 
-The extension types `@`-references into your Claude Code terminal input without pressing Enter, so you stay in control. For files it sends `@relative/path`, and for selections it sends `@relative/path:startLine-endLine`.
+References are inserted without pressing Enter, so you stay in control. For files it sends `@relative/path`, and for selections it sends `@relative/path:startLine-endLine`.
 
-Paths are resolved relative to the Claude Code terminal's working directory. In multi-root workspaces, files in the terminal's folder get short relative paths while files in other workspace folders get absolute paths, so Claude Code always resolves the correct file.
+**Terminal mode:** Paths are resolved relative to the Claude Code terminal's working directory. In multi-root workspaces, files in the terminal's folder get short relative paths while files in other workspace folders get absolute paths.
+
+**Panel mode:** Paths are resolved relative to the workspace root via VS Code's built-in `asRelativePath`. The extension auto-detects which Claude Code VS Code extension panel (sidebar or editor tab) is currently visible and inserts there.
 
 <details>
 <summary>Development</summary>
@@ -74,8 +80,8 @@ To test in VS Code, press `F5` to launch the Extension Development Host.
 ### Building & Installing Locally
 
 ```bash
-npm run package      # Produces claude-code-context-plus-0.1.0.vsix
-code --install-extension claude-code-context-plus-0.1.0.vsix
+npm run package      # Produces claude-code-context-add-0.1.0.vsix
+code --install-extension claude-code-context-add-0.1.0.vsix
 ```
 
 </details>

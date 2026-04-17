@@ -1,14 +1,23 @@
 {
-  "name": "claude-code-context-plus",
-  "displayName": "Claude Code Context Plus",
-  "description": "Add files and selections to Claude Code terminal context via right-click menus and keyboard shortcuts",
+  "name": "claude-code-context-add",
+  "displayName": "Claude Code Context Add",
+  "description": "Add files and selections to Claude Code terminal/panel context via right-click menus and keyboard shortcuts. Forked from claude-code-context-plus.",
   "version": "0.1.0",
-  "publisher": "jeffycyang",
+  "publisher": "YangYangLeeLee",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jeffycyang/claude-vscode-context-plus.git"
+    "url": "https://github.com/FE-runner/claude-vscode-context-add.git"
+  },
+  "internalRepository": {
+    "type": "git",
+    "url": "http://git.domob-inc.cn/yang.li12/claude-code-context-add.git"
   },
   "license": "MIT",
+  "forkedFrom": {
+    "name": "claude-code-context-plus",
+    "publisher": "jeffycyang",
+    "repository": "https://github.com/jeffycyang/claude-vscode-context-plus"
+  },
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -35,65 +44,95 @@
   "contributes": {
     "commands": [
       {
-        "command": "claudeContextPlus.addFileToContext",
+        "command": "claudeContextAdd.addFileToContext",
         "title": "Add to Claude Code",
-        "category": "Claude Code Context Plus"
+        "category": "Claude Code Context Add"
       },
       {
-        "command": "claudeContextPlus.sendSelectionToContext",
+        "command": "claudeContextAdd.sendSelectionToContext",
         "title": "Send Selection to Claude Code",
-        "category": "Claude Code Context Plus"
+        "category": "Claude Code Context Add"
       },
       {
-        "command": "claudeContextPlus.setAsClaudeTerminal",
+        "command": "claudeContextAdd.setAsClaudeTerminal",
         "title": "Set as Claude Code Terminal",
-        "category": "Claude Code Context Plus"
+        "category": "Claude Code Context Add"
       },
       {
-        "command": "claudeContextPlus.selectTerminal",
+        "command": "claudeContextAdd.selectTerminal",
         "title": "Select Claude Code Terminal",
-        "category": "Claude Code Context Plus"
+        "category": "Claude Code Context Add"
+      },
+      {
+        "command": "claudeContextAdd.selectTarget",
+        "title": "Select Target Mode",
+        "category": "Claude Code Context Add"
       }
     ],
     "menus": {
+      "commandPalette": [
+        {
+          "command": "claudeContextAdd.setAsClaudeTerminal",
+          "when": "config.claudeContextAdd.target != 'panel'"
+        },
+        {
+          "command": "claudeContextAdd.selectTerminal",
+          "when": "config.claudeContextAdd.target != 'panel'"
+        }
+      ],
       "explorer/context": [
         {
-          "command": "claudeContextPlus.addFileToContext",
+          "command": "claudeContextAdd.addFileToContext",
           "group": "navigation"
         }
       ],
       "editor/context": [
         {
-          "command": "claudeContextPlus.sendSelectionToContext",
+          "command": "claudeContextAdd.sendSelectionToContext",
           "when": "editorHasSelection",
           "group": "navigation"
         }
       ],
       "editor/title/context": [
         {
-          "command": "claudeContextPlus.addFileToContext",
+          "command": "claudeContextAdd.addFileToContext",
           "group": "navigation"
         }
       ]
     },
     "keybindings": [
       {
-        "command": "claudeContextPlus.addFileToContext",
+        "command": "claudeContextAdd.addFileToContext",
         "key": "ctrl+shift+.",
         "mac": "cmd+shift+.",
         "when": "editorFocus"
       },
       {
-        "command": "claudeContextPlus.sendSelectionToContext",
+        "command": "claudeContextAdd.sendSelectionToContext",
         "key": "ctrl+shift+,",
         "mac": "cmd+shift+,",
         "when": "editorHasSelection"
       }
     ],
     "configuration": {
-      "title": "Claude Code Context Plus",
+      "title": "Claude Code Context Add",
       "properties": {
-        "claudeContextPlus.terminalNamePatterns": {
+        "claudeContextAdd.target": {
+          "type": "string",
+          "enum": [
+            "auto",
+            "terminal",
+            "panel"
+          ],
+          "enumDescriptions": [
+            "Use terminal if a Claude Code terminal is found, otherwise fall back to the VS Code extension panel",
+            "Always send to the Claude Code terminal",
+            "Always send to the Claude Code VS Code extension panel"
+          ],
+          "default": "auto",
+          "description": "Where to send file and selection references"
+        },
+        "claudeContextAdd.terminalNamePatterns": {
           "type": "array",
           "items": {
             "type": "string"

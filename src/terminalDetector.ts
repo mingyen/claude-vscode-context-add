@@ -53,7 +53,7 @@ export class TerminalDetector implements vscode.Disposable {
   }
 
   private isClaudeTerminal(terminal: vscode.Terminal): boolean {
-    const config = vscode.workspace.getConfiguration('claudeContextPlus');
+    const config = vscode.workspace.getConfiguration('claudeContextAdd');
     const customPatterns: string[] = config.get('terminalNamePatterns', []);
     return matchesClaudeTerminalName(terminal.name, customPatterns);
   }

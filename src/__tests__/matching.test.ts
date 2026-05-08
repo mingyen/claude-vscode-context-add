@@ -48,6 +48,18 @@ describe('matchesClaudeTerminalName', () => {
   it('skips invalid regex in custom patterns', () => {
     expect(matchesClaudeTerminalName('bash', ['[invalid'])).toBe(false);
   });
+
+  it('rejects empty string', () => {
+    expect(matchesClaudeTerminalName('')).toBe(false);
+  });
+
+  it('matches when a later custom pattern matches and earlier ones do not', () => {
+    expect(matchesClaudeTerminalName('myterm', ['nope', 'myterm'])).toBe(true);
+  });
+
+  it('skips invalid regex but still evaluates remaining valid patterns', () => {
+    expect(matchesClaudeTerminalName('myterm', ['[invalid', 'myterm'])).toBe(true);
+  });
 });
 
 describe('toRelativePath', () => {
@@ -96,6 +108,22 @@ describe('toRelativePath', () => {
     );
     expect(result).toBe('/projects/repo-b/src/utils.ts');
   });
+
+  it('handles deeply nested paths', () => {
+    const result = toRelativePath(
+      '/projects/myapp/a/b/c/d.ts',
+      ['/projects/myapp'],
+    );
+    expect(result).toBe('a/b/c/d.ts');
+  });
+
+  it('handles paths with spaces', () => {
+    const result = toRelativePath(
+      '/my projects/my app/src/index.ts',
+      ['/my projects/my app'],
+    );
+    expect(result).toBe('src/index.ts');
+  });
 });
 
 describe('formatLineRef', () => {
@@ -109,6 +137,14 @@ describe('formatLineRef', () => {
 
   it('handles line 1', () => {
     expect(formatLineRef('file.ts', 1, 1)).toBe('@file.ts:1');
+  });
+
+  it('handles path with spaces', () => {
+    expect(formatLineRef('my file.ts', 3, 7)).toBe('@my file.ts:3-7');
+  });
+
+  it('handles large line numbers', () => {
+    expect(formatLineRef('src/big.ts', 1000, 2000)).toBe('@src/big.ts:1000-2000');
   });
 });
 
@@ -133,5 +169,25 @@ describe('sanitizePathForTerminal', () => {
 
   it('preserves tab characters', () => {
     expect(sanitizePathForTerminal('a\tb.ts')).toBe('a\tb.ts');
+  });
+
+  it('strips DEL character (\\x7f)', () => {
+    expect(sanitizePathForTerminal('a\x7fb.ts')).toBe('ab.ts');
+  });
+
+  it('returns empty string for input with only control characters', () => {
+    expect(sanitizePathForTerminal('\x00\n\r\x1b')).toBe('');
+  });
+
+  it('handles empty string input', () => {
+    expect(sanitizePathForTerminal('')).toBe('');
+  });
+
+  it('strips CRLF sequence', () => {
+    expect(sanitizePathForTerminal('foo\r\nbar.ts')).toBe('foobar.ts');
+  });
+
+  it('preserves paths with spaces', () => {
+    expect(sanitizePathForTerminal('my file name.ts')).toBe('my file name.ts');
   });
 });

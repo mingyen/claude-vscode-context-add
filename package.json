@@ -116,7 +116,7 @@
       {
         "command": "claudeContextAdd.sendSelectionToContext",
         "key": "ctrl+shift+,",
-        "mac": "cmd+shift+,",
+        "mac": "cmd+l",
         "when": "editorHasSelection"
       }
     ],

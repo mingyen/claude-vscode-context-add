@@ -40,6 +40,12 @@
   "activationEvents": [
     "onStartupFinished"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": "limited",
+      "description": "In untrusted workspaces, file paths from the workspace are sanitized before being sent to the Claude Code terminal to prevent injection of control characters. All commands remain available."
+    }
+  },
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [

@@ -8,6 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm install          # Install dependencies
 npm run build        # Build once (with sourcemaps, for development)
 npm run build:prod   # Build minified (for packaging)
+npm run launch       # Build then open a new VS Code window with the extension loaded
 npm run watch        # Build on save
 npm test             # Run tests (vitest, no vscode dependency)
 npm run test:watch   # Run tests in watch mode
@@ -41,6 +42,8 @@ The extension has five modules wired together in `extension.ts`:
 - `"terminal"` — use terminal only (error if none found)
 - `"panel"` — use Claude Code VS Code extension panel only
 - `"auto"` (default) — terminal first, fall back to panel if no terminal found
+
+The `claudeContextAdd.selectTarget` command lets users switch target mode at runtime via QuickPick. The `claudeContextAdd.terminalNamePatterns` setting accepts additional regex patterns for terminal name matching beyond the built-in heuristics.
 
 ## Key Design Decisions
 

@@ -3,6 +3,7 @@ import {
   matchesClaudeTerminalName,
   toRelativePath,
   formatLineRef,
+  sanitizePathForTerminal,
 } from '../matching';
 
 describe('matchesClaudeTerminalName', () => {
@@ -108,5 +109,29 @@ describe('formatLineRef', () => {
 
   it('handles line 1', () => {
     expect(formatLineRef('file.ts', 1, 1)).toBe('@file.ts:1');
+  });
+});
+
+describe('sanitizePathForTerminal', () => {
+  it('passes normal paths through unchanged', () => {
+    expect(sanitizePathForTerminal('src/index.ts')).toBe('src/index.ts');
+    expect(sanitizePathForTerminal('/abs/path/to/file.ts')).toBe('/abs/path/to/file.ts');
+  });
+
+  it('strips embedded LF', () => {
+    expect(sanitizePathForTerminal('evil\n; rm -rf ~\n.txt'))
+      .toBe('evil; rm -rf ~.txt');
+  });
+
+  it('strips embedded CR', () => {
+    expect(sanitizePathForTerminal('foo\rbar.ts')).toBe('foobar.ts');
+  });
+
+  it('strips other C0 control characters', () => {
+    expect(sanitizePathForTerminal('a\x00b\x07c.ts')).toBe('abc.ts');
+  });
+
+  it('preserves tab characters', () => {
+    expect(sanitizePathForTerminal('a\tb.ts')).toBe('a\tb.ts');
   });
 });

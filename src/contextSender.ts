@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { TerminalDetector } from './terminalDetector';
-import { toRelativePath, formatLineRef } from './matching';
+import { toRelativePath, formatLineRef, sanitizePathForTerminal } from './matching';
 
 export class ContextSender {
   constructor(private readonly detector: TerminalDetector) {}
@@ -10,9 +10,17 @@ export class ContextSender {
     if (!terminal) return;
 
     const workspacePaths = this.getTerminalWorkspacePaths(terminal);
-    const refs = uris
-      .map((uri) => `@${toRelativePath(uri.fsPath, workspacePaths)}`)
-      .join(' ');
+    const rawRefs = uris.map((uri) => toRelativePath(uri.fsPath, workspacePaths));
+    const safeRefs = rawRefs.map((p) => sanitizePathForTerminal(p));
+    const stripped = rawRefs.some((p, i) => p !== safeRefs[i]);
+
+    if (stripped) {
+      vscode.window.showWarningMessage(
+        'Removed unsafe characters (newlines/control codes) from one or more file paths before sending to terminal.',
+      );
+    }
+
+    const refs = safeRefs.map((p) => `@${p}`).join(' ');
     terminal.sendText(' ' + refs + ' ', false);
     terminal.show(false);
   }
@@ -29,7 +37,13 @@ export class ContextSender {
 
     const sel = editor.selection;
     const workspacePaths = this.getTerminalWorkspacePaths(terminal);
-    const filePath = toRelativePath(editor.document.uri.fsPath, workspacePaths);
+    const rawPath = toRelativePath(editor.document.uri.fsPath, workspacePaths);
+    const filePath = sanitizePathForTerminal(rawPath);
+    if (rawPath !== filePath) {
+      vscode.window.showWarningMessage(
+        'Removed unsafe characters (newlines/control codes) from file path before sending to terminal.',
+      );
+    }
     const startLine = sel.start.line + 1;
     const endLine = sel.end.line + 1;
 

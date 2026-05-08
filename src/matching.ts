@@ -47,3 +47,9 @@ export function formatLineRef(
   }
   return `@${filePath}:${startLine}-${endLine}`;
 }
+
+export function sanitizePathForTerminal(path: string): string {
+  // Strip CR, LF, and other C0 control characters that terminals interpret.
+  // Tabs (\x09) are kept as they are valid path characters and harmless in shells.
+  return path.replace(/[\x00-\x08\x0a-\x1f\x7f]/g, '');
+}

@@ -79,10 +79,24 @@ To test in VS Code, press `F5` to launch the Extension Development Host.
 
 ### Building & Installing Locally
 
+**Option 1 — Command line:**
+
 ```bash
-npm run package      # Produces claude-code-context-add-0.1.0.vsix
-code --install-extension claude-code-context-add-0.1.0.vsix
+npm run package      # Produces claude-code-context-add-*.vsix
+code --install-extension claude-code-context-add-*.vsix
 ```
+
+**Option 2 — VS Code UI:**
+
+```bash
+npm run package      # Produces claude-code-context-add-*.vsix
+```
+
+Then in VS Code:
+1. Open the Extensions panel (`Cmd+Shift+X` on Mac / `Ctrl+Shift+X` on Windows/Linux)
+2. Click the `...` menu (top-right of the panel)
+3. Select **"Install from VSIX..."**
+4. Choose the generated `.vsix` file
 
 </details>
 

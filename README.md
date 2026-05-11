@@ -2,8 +2,8 @@
 
 A VS Code extension that bridges your editor and [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI. Right-click files or selections to send them as `@`-references directly into your Claude Code terminal or the Claude Code VS Code extension panel.
 
-> **Forked from [claude-code-context-plus](https://github.com/jeffycyang/claude-vscode-context-plus) by [@jeffycyang](https://github.com/jeffycyang)**, licensed under MIT.
-> Added support for the Claude Code VS Code extension panel (sidebar / editor tab), target configuration, and bug fixes.
+> Forked from [FE-runner/claude-vscode-context-add](https://github.com/FE-runner/claude-vscode-context-add), which itself originated from [claude-code-context-plus](https://github.com/jeffycyang/claude-vscode-context-plus) by [@jeffycyang](https://github.com/jeffycyang), licensed under MIT.
+
 
 ## Features
 

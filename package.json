@@ -109,8 +109,8 @@
     "keybindings": [
       {
         "command": "claudeContextAdd.addFileToContext",
-        "key": "ctrl+shift+.",
-        "mac": "cmd+shift+.",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
         "when": "editorFocus"
       },
       {

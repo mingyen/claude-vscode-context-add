@@ -38,7 +38,7 @@ References are typed into the Claude Code input without pressing Enter, so you s
 
 | Action | Mac | Windows/Linux |
 |---|---|---|
-| Add current file to context | `Cmd+Shift+.` | `Ctrl+Shift+.` |
+| Add current file to context | `Cmd+Shift+A` | `Ctrl+Shift+A` |
 | Send selection to context | `Cmd+L` | `Ctrl+Shift+,` |
 
 ## Commands

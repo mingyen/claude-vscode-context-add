@@ -65,8 +65,7 @@ References are inserted without pressing Enter, so you stay in control. For file
 
 **Panel mode:** Paths are resolved relative to the workspace root via VS Code's built-in `asRelativePath`. The extension auto-detects which Claude Code VS Code extension panel (sidebar or editor tab) is currently visible and inserts there.
 
-<details>
-<summary>Development</summary>
+## Development
 
 ```bash
 npm install
@@ -97,8 +96,6 @@ Then in VS Code:
 2. Click the `...` menu (top-right of the panel)
 3. Select **"Install from VSIX..."**
 4. Choose the generated `.vsix` file
-
-</details>
 
 ## License
 
